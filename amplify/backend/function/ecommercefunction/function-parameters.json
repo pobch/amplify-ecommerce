@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "auth": {
+      "amplifyecommerce3b5d64e7": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    },
+    "storage": {
+      "producttable": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}
