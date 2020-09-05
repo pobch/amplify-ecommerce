@@ -125,15 +125,26 @@ app.post('/products', async function (req, res) {
 //   res.json({ success: 'put call succeed!', url: req.url, body: req.body })
 // })
 
-app.delete('/products', function (req, res) {
-  // Add your code here
-  res.json({ success: 'delete call succeed!', url: req.url })
+app.delete('/products', async function (req, res) {
+  const { body } = req
+  const { event } = req.apiGateway
+  try {
+    await canPerformAction(event, 'Admin')
+    const params = {
+      TableName: ddb_table_name,
+      Key: { id: body.id },
+    }
+    await docClient.delete(params).promise()
+    res.json({ success: 'successfully deleted item' })
+  } catch (err) {
+    res.json({ error: err })
+  }
 })
 
-app.delete('/products/*', function (req, res) {
-  // Add your code here
-  res.json({ success: 'delete call succeed!', url: req.url })
-})
+// app.delete('/products/*', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'delete call succeed!', url: req.url })
+// })
 
 app.listen(3000, function () {
   console.log('App started')
