@@ -69,51 +69,61 @@ app.use(function (req, res, next) {
   next()
 })
 
-/**********************
- * Example get method *
- **********************/
-
-app.get('/products', function (req, res) {
-  // Add your code here
-  res.json({ success: 'get call succeed!', url: req.url })
+app.get('/products', async function (req, res) {
+  try {
+    const data = await getItems()
+    res.json({ data })
+  } catch (e) {
+    res.json({ error: e })
+  }
 })
 
-app.get('/products/*', function (req, res) {
-  // Add your code here
-  res.json({ success: 'get call succeed!', url: req.url })
+async function getItems() {
+  const params = { TableName: ddb_table_name }
+  try {
+    const data = await docClient.scan(params).promise()
+    return data
+  } catch (e) {
+    throw e
+  }
+}
+
+// app.get('/products/*', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'get call succeed!', url: req.url })
+// })
+
+app.post('/products', async function (req, res) {
+  const { body } = req
+  const { event } = req.apiGateway
+  try {
+    await canPerformAction(event, 'Admin')
+    const input = { ...body, id: uuid() }
+    const params = {
+      TableName: ddb_table_name,
+      Item: input,
+    }
+    await docClient.put(params).promise()
+    res.json({ success: 'item saved to database' })
+  } catch (err) {
+    res.json({ error: err })
+  }
 })
 
-/****************************
- * Example post method *
- ****************************/
+// app.post('/products/*', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'post call succeed!', url: req.url, body: req.body })
+// })
 
-app.post('/products', function (req, res) {
-  // Add your code here
-  res.json({ success: 'post call succeed!', url: req.url, body: req.body })
-})
+// app.put('/products', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'put call succeed!', url: req.url, body: req.body })
+// })
 
-app.post('/products/*', function (req, res) {
-  // Add your code here
-  res.json({ success: 'post call succeed!', url: req.url, body: req.body })
-})
-
-/****************************
- * Example put method *
- ****************************/
-
-app.put('/products', function (req, res) {
-  // Add your code here
-  res.json({ success: 'put call succeed!', url: req.url, body: req.body })
-})
-
-app.put('/products/*', function (req, res) {
-  // Add your code here
-  res.json({ success: 'put call succeed!', url: req.url, body: req.body })
-})
-
-/****************************
- * Example delete method *
- ****************************/
+// app.put('/products/*', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'put call succeed!', url: req.url, body: req.body })
+// })
 
 app.delete('/products', function (req, res) {
   // Add your code here
