@@ -10,13 +10,13 @@ function Nav(props) {
   const [user, setUser] = useState({})
 
   useEffect(() => {
-    checkUser(setUser) // catch??
+    checkUser(setUser) // there is a `catch` inside `checkUser`
     Hub.listen('auth', (data) => {
       const {
         payload: { event },
       } = data
       console.log('event: ', event)
-      if (event === 'signIn' || event === 'signOut') checkUser(setUser) // catch??
+      if (event === 'signIn' || event === 'signOut') checkUser(setUser)
     })
     // unlisten ??
   }, [])
